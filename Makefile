@@ -5,5 +5,5 @@ obu:
 	./bin/obu
 
 receiver:
-	go build -o bin/receiver dataReceiver/main.go
+	go build -o bin/receiver ./dataReceiver 
 	./bin/receiver
