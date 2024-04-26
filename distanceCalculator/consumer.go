@@ -35,12 +35,13 @@ func NewKafkaConsumer(topic string) (DataConsumer, error) {
 	c.SubscribeTopics([]string{topic}, nil)
 
 	calcSVC := NewCalculatorService()
+	nextCalcSVC := NewLogMiddleware(calcSVC)
 
 	// A signal handler or similar could be used to set this to false to break the loop.
 	return &KafkaConsumer{
 		consumer:    c,
 		topic:       topic,
-		calcService: calcSVC,
+		calcService: nextCalcSVC,
 	}, nil
 }
 
