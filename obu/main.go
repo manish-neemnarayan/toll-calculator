@@ -11,7 +11,7 @@ import (
 	"github.com/manish-neemnarayan/toll-calculator/types"
 )
 
-const sendInterval = time.Second
+const sendInterval = time.Second * 5
 const wsEndpoint = "ws://127.0.0.1:9002/ws"
 
 func genLatLong() (float64, float64) {

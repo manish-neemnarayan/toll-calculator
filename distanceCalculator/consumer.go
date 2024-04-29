@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
+	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
+	"github.com/manish-neemnarayan/toll-calculator/aggregator/client"
 	"github.com/manish-neemnarayan/toll-calculator/types"
 	"github.com/sirupsen/logrus"
 )
@@ -19,6 +20,7 @@ type KafkaConsumer struct {
 	consumer    *kafka.Consumer
 	isRunning   bool
 	calcService CalculatorServicer
+	aggClient   *client.Client
 }
 
 func NewKafkaConsumer(topic string) (DataConsumer, error) {
@@ -36,12 +38,13 @@ func NewKafkaConsumer(topic string) (DataConsumer, error) {
 
 	calcSVC := NewCalculatorService()
 	nextCalcSVC := NewLogMiddleware(calcSVC)
-
+	aggClient := client.NewClient("http://localhost:3001/aggregate")
 	// A signal handler or similar could be used to set this to false to break the loop.
 	return &KafkaConsumer{
 		consumer:    c,
 		topic:       topic,
 		calcService: nextCalcSVC,
+		aggClient:   aggClient,
 	}, nil
 }
 
@@ -72,6 +75,16 @@ func (c *KafkaConsumer) consumeData() {
 			continue
 		}
 
-		fmt.Println(distance)
+		req := types.Distance{
+			Value: distance,
+			Unix:  time.Now().UnixNano(),
+			OBUID: data.OBUID,
+		}
+
+		if err := c.aggClient.AggregateInvoice(req); err != nil {
+			logrus.Errorf("aggregate error: %v", err)
+			continue
+		}
+
 	}
 }
