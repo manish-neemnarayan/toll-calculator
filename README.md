@@ -15,7 +15,7 @@ For Mac users you can use Brew for this
 brew install protobuff
 ```
 
-## Installing GRPC and Protobuffer plugins for Golang.
+## Installing GRPC and Protobuffer plugins for Golang
 1. Protobuffers
 ``:
 go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
