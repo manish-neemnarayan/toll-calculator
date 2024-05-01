@@ -55,5 +55,10 @@ func main() {
 }
 
 func init() {
+	x := types.Test{
+		I1: 34,
+		I2: 23,
+	}
+	_ = &x
 	rand.Seed(time.Now().UnixNano())
 }
