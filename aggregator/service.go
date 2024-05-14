@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/manish-neemnarayan/toll-calculator/types"
 )
 
@@ -25,6 +27,7 @@ func NewInvoiceAggregator(store Storer) Aggregator {
 }
 
 func (i *InvoiceAggregator) AggregateDistance(distance types.Distance) error {
+	fmt.Println("inside aggregate-distance svc")
 	i.store.Insert(distance)
 	return nil
 }

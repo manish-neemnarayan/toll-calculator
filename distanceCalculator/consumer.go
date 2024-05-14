@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"time"
@@ -20,10 +21,12 @@ type KafkaConsumer struct {
 	consumer    *kafka.Consumer
 	isRunning   bool
 	calcService CalculatorServicer
-	aggClient   *client.Client
+	aggClient   client.Client
 }
 
 func NewKafkaConsumer(topic string) (DataConsumer, error) {
+	const aggregatorEndpoint = ":3001"
+
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": "localhost",
 		"group.id":          "myGroup",
@@ -38,13 +41,19 @@ func NewKafkaConsumer(topic string) (DataConsumer, error) {
 
 	calcSVC := NewCalculatorService()
 	nextCalcSVC := NewLogMiddleware(calcSVC)
-	aggClient := client.NewClient("http://localhost:3001/aggregate")
+	// aggClient := client.NewHttpClient("http://localhost:3001/aggregate")
+
+	grpcClient, err := client.NewGRPCClient(aggregatorEndpoint)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// A signal handler or similar could be used to set this to false to break the loop.
 	return &KafkaConsumer{
 		consumer:    c,
 		topic:       topic,
 		calcService: nextCalcSVC,
-		aggClient:   aggClient,
+		aggClient:   grpcClient,
 	}, nil
 }
 
@@ -75,13 +84,13 @@ func (c *KafkaConsumer) consumeData() {
 			continue
 		}
 
-		req := types.Distance{
+		req := types.AggregateRequest{
 			Value: distance,
 			Unix:  time.Now().UnixNano(),
-			OBUID: data.OBUID,
+			OBUID: int32(data.OBUID),
 		}
 
-		if err := c.aggClient.AggregateInvoice(req); err != nil {
+		if err := c.aggClient.Aggregate(context.Background(), &req); err != nil {
 			logrus.Errorf("aggregate error: %v", err)
 			continue
 		}

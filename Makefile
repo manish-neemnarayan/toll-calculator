@@ -1,4 +1,4 @@
-.PHONY: obu receiver calc invoicer
+.PHONY: obu receiver calc invoicer proto
 
 obu:
 	go build -o bin/obu obu/main.go
@@ -17,4 +17,4 @@ agg:
 	./bin/aggregator
 
 proto:
-	protoc --go_out=. --go_opt=paths=source_relative types/ptypes.proto
+	protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative types/ptypes.proto
