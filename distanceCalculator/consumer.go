@@ -41,7 +41,7 @@ func NewKafkaConsumer(topic string) (DataConsumer, error) {
 
 	calcSVC := NewCalculatorService()
 	nextCalcSVC := NewLogMiddleware(calcSVC)
-	// aggClient := client.NewHttpClient("http://localhost:3001/aggregate")
+	// HTTPClient := client.NewHttpClient("http://localhost:3000")
 
 	grpcClient, err := client.NewGRPCClient(aggregatorEndpoint)
 	if err != nil {

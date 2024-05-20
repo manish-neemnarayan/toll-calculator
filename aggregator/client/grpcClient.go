@@ -29,6 +29,10 @@ func NewGRPCClient(endpoint string) (Client, error) {
 	}, nil
 }
 
+func (c *GRPCClient) GetInvoice(ctx context.Context, id int) (*types.Invoice, error) {
+	return &types.Invoice{}, nil
+}
+
 func (c *GRPCClient) Aggregate(ctx context.Context, req *types.AggregateRequest) error {
 	fmt.Println("came here hey man----")
 	_, err := c.AggregatorClient.Aggregate(ctx, req)

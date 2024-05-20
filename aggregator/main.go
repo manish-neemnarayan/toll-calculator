@@ -75,7 +75,7 @@ func makeHttpTransport(listenAddr string, svc Aggregator) {
 func InvoiceHandler(svc Aggregator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var obuId = r.URL.Query()["obuId"][0]
-
+		fmt.Println(obuId)
 		id, err := strconv.Atoi(obuId)
 		if err != nil {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
@@ -85,8 +85,7 @@ func InvoiceHandler(svc Aggregator) http.HandlerFunc {
 		if err != nil {
 			writeJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
 		}
-
-		writeJSON(w, http.StatusOK, map[string]any{"data": inv})
+		writeJSON(w, http.StatusOK, inv)
 	}
 }
 
@@ -105,8 +104,8 @@ func AggregateHandler(svc Aggregator) http.HandlerFunc {
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) error {
-	w.WriteHeader(status)
 	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(status)
 	return json.NewEncoder(w).Encode(v)
 }
 

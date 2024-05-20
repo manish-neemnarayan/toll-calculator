@@ -34,7 +34,6 @@ func (i *InvoiceAggregator) AggregateDistance(distance types.Distance) error {
 
 func (i *InvoiceAggregator) Invoice(id int) (inv *types.Invoice, err error) {
 	var BaseAmount float64 = 12
-
 	dist, err := i.store.Get(id)
 	if err != nil {
 		return &types.Invoice{
